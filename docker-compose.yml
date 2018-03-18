@@ -1,0 +1,33 @@
+
+version: "3"
+
+services:
+    elk:
+        image: elk
+        container_name: elk
+
+    web1:
+        image: web1
+        container_name: web1
+        depends_on:
+            - "elk"
+
+    web2:
+        image: web2
+        container_name: web2
+        depends_on:
+            - "web1"
+
+    web3:
+        image: web3
+        container_name: web3
+        depends_on:
+            - "web2"
+
+    haproxy:
+        build: ./haproxy
+        container_name: haproxy
+        ports:
+            - "80:80"
+        depends_on:
+            - "web3"
