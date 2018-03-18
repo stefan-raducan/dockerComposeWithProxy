@@ -9,7 +9,7 @@ Running the project:
 ```bash
 git clone https://github.com/stefan-raducan/dockerComposeWithProxy.git
 
-docker build -t web1 ./web1
+docker build -t web1 ./web1 
 docker build -t web2 ./web2
 docker build -t web3 ./web3
 docker build -t elk ./elk
@@ -23,10 +23,10 @@ localhost:80/web1
 
 Redirects:
 
-localhost:80/web1 -> web1:8080
-localhost:80/web2 -> web2:3000
-localhost:80/web3 -> web3:5000
-localhost:80/kib -> elk:5601
+localhost:80/web1 -> web1:8080 <br />
+localhost:80/web2 -> web2:3000 <br />
+localhost:80/web3 -> web3:5000 <br /> 
+localhost:80/kib -> elk:5601 <br />
 
 ### Issues
 
