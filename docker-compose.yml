@@ -1,33 +1,82 @@
 
 version: "3"
 
-services:
-    elk:
-        image: elk
-        container_name: elk
+#tb builduite imaginile cu tag-ul corect inainte de docker-compose up --build
+#docker image build --tag web1 ./
 
+services:
+    elasticsearch:
+        image: elasticsearch
+        container_name: elasticsearch
+        volumes:
+            - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+        environment:
+            ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+        networks:
+            - backend   #172.27.0.2
+
+    logstash:
+        image: logstash
+        container_name: logstash
+        volumes:
+            - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+            - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+        environment:
+            LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+        depends_on:
+            - elasticsearch
+        networks:
+            - backend   #172.27.0.3
+
+    kibana:
+        image: kibana
+        container_name: kibana
+        volumes:
+            - ./kibana/config/:/usr/share/kibana/config:ro
+        depends_on:
+            - elasticsearch
+        networks:
+            - backend   #172.27.0.4
+##################################
     web1:
         image: web1
         container_name: web1
         depends_on:
-            - "elk"
-
+            - kibana
+        networks:
+            - backend   #172.27.0.5
     web2:
         image: web2
         container_name: web2
+        networks:
+            - backend   #172.27.0.6
         depends_on:
             - "web1"
-
     web3:
         image: web3
         container_name: web3
+        networks:
+            - backend   #172.27.0.7
         depends_on:
             - "web2"
-
-    haproxy:
-        build: ./haproxy
+##################################
+    proxy:
+        build: haproxy
         container_name: haproxy
         ports:
             - "80:80"
         depends_on:
             - "web3"
+        networks:
+            - front-end #172.28.0.2
+            - backend   #172.27.0.8
+##################################
+networks:
+    backend:
+        driver: bridge
+        # subnet: 172.27.0.0/16
+    front-end:
+        driver: bridge
+        # ipam:
+        #     config:
+        #         - subnet: 172.28.0.0/16
